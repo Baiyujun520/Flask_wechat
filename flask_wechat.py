@@ -41,7 +41,7 @@ def wechat():
         xml_dict = xmltodict.parse(xml_data)['xml']
         msg_type = xml_dict['MsgType']
 
-        if "test" == msg_type:
+        if "text" == msg_type:
             res_dict = {
                 "ToUserName": xml_dict.get("FromUserName"),
                 "FromUserName": xml_dict.get("ToUserName"),
@@ -50,6 +50,18 @@ def wechat():
                 "Content": xml_dict.get("Content"),
             }
             print xml_dict.get("Content")
+
+        elif "voice" == msg_type:
+            # 接受语音消息
+            res_dict = {
+                "ToUserName": xml_dict.get("FromUserName"),
+                "FromUserName": xml_dict.get("ToUserName"),
+                "CreateTime": int(time.time()),
+                "MsgType": "text",
+                "Content": xml_dict.get("Recognition"),
+            }
+
+            print xml_dict.get('Recognition')
         else:
             res_dict = {
                 "ToUserName": xml_dict.get("FromUserName"),
