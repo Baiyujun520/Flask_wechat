@@ -62,6 +62,40 @@ def wechat():
             }
 
             print xml_dict.get('Recognition')
+
+        elif "event" == msg_type:
+            if "subscribe" == xml_dict.get('Event'):
+                # 代表当前用户关注了
+                res_dict = {
+                    "ToUserName": xml_dict.get("FromUserName"),
+                    "FromUserName": xml_dict.get("ToUserName"),
+                    "CreateTime": int(time.time()),
+                    "MsgType": "text",
+                    "Content": "感谢你的关注",
+                }
+                if xml_dict.get("EventKey"):
+                    res_dict["Content"] += ";场景值是："
+                    res_dict["Content"] += xml_dict.get("EventKey")
+
+            elif "SCAN" == xml_dict.get("Event"):
+                # 代表当前用户已经关注，扫描二维码
+                res_dict = {
+                    "ToUserName": xml_dict.get("FromUserName"),
+                    "FromUserName": xml_dict.get("ToUserName"),
+                    "CreateTime": int(time.time()),
+                    "MsgType": "text",
+                    "Content": "感谢你的扫描"
+                }
+
+                if xml_dict.get("EventKey"):
+                    res_dict["Content"] += "；场景值是："
+                    res_dict["Content"] += xml_dict.get("EventKey")
+
+            else:
+                # 可能取消了关注
+                print '取消了关注'
+                res_dict = None
+
         else:
             res_dict = {
                 "ToUserName": xml_dict.get("FromUserName"),
@@ -70,9 +104,11 @@ def wechat():
                 "MsgType": "text",
                 "Content": "就是这么骚",
             }
-
-        res_dict = {'xml': res_dict}
-        return xmltodict.unparse(res_dict)
+        if res_dict:
+            res_dict = {'xml': res_dict}
+            return xmltodict.unparse(res_dict)
+        else:
+            return ""
     else:
         return 'error', 403
 
